@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missão Corpo Humano — 6º ano</title>
+<style>
+:root{--navy:#172554;--blue:#2563eb;--cyan:#06b6d4;--bg:#eef4ff;--ink:#172033;--muted:#64748b;--green:#15803d;--red:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#e0f2fe,#eef2ff 55%,#f5f3ff);color:var(--ink);min-height:100vh;padding:22px}
+.wrap{max-width:850px;margin:auto}
+.card{background:#fff;border-radius:24px;padding:clamp(20px,4vw,38px);box-shadow:0 18px 50px #1e3a8a18}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.tag{background:#dbeafe;color:#1d4ed8;border-radius:99px;padding:8px 13px;font-size:13px;font-weight:700}
+h1{font-size:clamp(27px,5vw,42px);line-height:1.05;margin:18px 0 10px;color:var(--navy)}
+h2{font-size:clamp(21px,4vw,29px);color:var(--navy);margin:8px 0 16px}
+p{line-height:1.55}
+.muted{color:var(--muted)}
+.namebox{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}
+input{flex:1;min-width:190px;border:2px solid #cbd5e1;border-radius:12px;padding:14px;font-size:16px}
+button{border:0;border-radius:12px;padding:13px 18px;font-size:16px;font-weight:700;cursor:pointer;transition:.15s}
+button:focus,input:focus{outline:3px solid #93c5fd;outline-offset:2px}
+.primary{background:var(--blue);color:#fff}.primary:hover{background:#1d4ed8}
+.secondary{background:#e2e8f0;color:#1e293b}
+.option{display:block;width:100%;text-align:left;background:#f8fafc;border:2px solid #dbe3ef;margin:10px 0;padding:15px 17px;color:#172033;line-height:1.35}
+.option:hover{border-color:#60a5fa;background:#eff6ff}
+.option.selected{border-color:var(--blue);background:#dbeafe}
+.option.correct{border-color:#22c55e;background:#dcfce7}
+.option.wrong{border-color:#ef4444;background:#fee2e2}
+.progress{height:10px;background:#e2e8f0;border-radius:20px;overflow:hidden;margin:18px 0}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#06b6d4);transition:width .25s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;font-weight:700}
+.feedback{padding:13px 15px;border-radius:12px;margin:14px 0;font-weight:700}
+.good{background:#dcfce7;color:#166534}.bad{background:#fee2e2;color:#991b1b}
+.actions{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:20px}
+.hidden{display:none!important}
+.result{text-align:center}
+.score{font-size:clamp(48px,10vw,76px);font-weight:900;color:var(--blue);margin:10px 0}
+.stamp{display:inline-block;border:3px solid #2563eb;color:#1d4ed8;border-radius:16px;padding:10px 18px;font-weight:900;letter-spacing:2px;transform:rotate(-2deg);margin:8px}
+.summary{background:#f8fafc;border-radius:16px;padding:18px;text-align:left;margin:20px 0}
+.summary p{margin:7px 0}
+footer{text-align:center;color:#64748b;font-size:12px;margin:16px}
+@media print{body{background:white;padding:0}.card{box-shadow:none;border:2px solid #dbeafe}.no-print{display:none!important}.result{display:block!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card" id="start">
+    <div class="top"><span class="tag">CIÊNCIAS • 6º ANO</span><span class="tag">MISSÃO 01</span></div>
+    <h1>MISSÃO CORPO HUMANO</h1>
+    <h2>Do microscópico ao organismo inteiro!</h2>
+    <p>Você foi convocado(a) para uma missão: descobrir como as partes do corpo humano se organizam e trabalham juntas. Responda às 10 perguntas, conquiste pontos e veja seu resultado no final.</p>
+    <p class="muted"><b>Como jogar:</b> informe seu nome, leia cada questão e escolha uma alternativa. Você receberá um retorno a cada resposta. No final, poderá salvar seu resultado com uma captura de tela.</p>
+    <div class="namebox"><input id="student" maxlength="50" placeholder="Digite seu nome" aria-label="Nome do estudante"><button class="primary" onclick="begin()">Começar missão</button></div>
+    <p class="muted">Dica: faça a atividade com atenção e sem consultar as respostas.</p>
+  </section>
+
+  <section class="card hidden" id="game">
+    <div class="top"><span class="tag">MISSÃO CORPO HUMANO</span><span class="tag" id="playerTag"></span></div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="meta"><span id="count">Questão 1 de 20</span><span id="points">0 pontos</span></div>
+    <h2 id="question"></h2>
+    <div id="options"></div>
+    <div id="feedback" class="hidden"></div>
+    <div class="actions"><button class="secondary" onclick="restart()">Recomeçar</button><button class="primary" id="next" onclick="advance()" disabled>Confirmar resposta</button></div>
+  </section>
+
+  <section class="card hidden result" id="result">
+    <div class="tag">MISSÃO CONCLUÍDA</div>
+    <h1>Parabéns, <span id="finalName"></span>!</h1>
+    <div class="stamp">RESULTADO OFICIAL</div>
+    <div class="score"><span id="finalScore">0</span>/20</div>
+    <h2 id="message"></h2>
+    <div class="summary">
+      <p><b>Estudante:</b> <span id="summaryName"></span></p>
+      <p><b>Acertos:</b> <span id="hits"></span> de 20</p>
+      <p><b>Pontuação:</b> <span id="percent"></span>%</p>
+      <p><b>Conteúdo:</b> Organização do corpo humano — células, tecidos, órgãos, sistemas e organismo.</p>
+      <p><b>Data:</b> <span id="today"></span></p>
+    </div>
+    <p id="encouragement"></p>
+    <div class="actions no-print" style="justify-content:center">
+      <button class="primary" onclick="window.print()">Imprimir / Salvar em PDF</button>
+      <button class="secondary" onclick="restart()">Jogar novamente</button>
+    </div>
+    <p class="muted no-print">Para enviar o resultado: tire um print desta tela (Windows: Win + Shift + S; celular: use os botões de captura de tela).</p>
+  </section>
+  <footer>Atividade de Ciências • Aprender também é uma missão!</footer>
+</div>
+<script>
+const quiz=[
+{q:"Qual é a menor unidade estrutural e funcional dos seres vivos?",o:["Órgão","Célula","Tecido","Sistema"],a:1,e:"A célula é a menor unidade estrutural e funcional dos seres vivos."},
+{q:"Um conjunto de células semelhantes que trabalham juntas forma:",o:["Um tecido","Um organismo","Um sistema","Um átomo"],a:0,e:"Células organizadas e que desempenham funções relacionadas formam um tecido."},
+{q:"Qual é a sequência correta dos níveis de organização do corpo humano?",o:["Órgãos → células → sistemas → tecidos","Tecidos → órgãos → células → sistemas","Células → tecidos → órgãos → sistemas → organismo","Sistemas → tecidos → organismo → células"],a:2,e:"A organização vai do nível menor ao maior: célula, tecido, órgão, sistema e organismo."},
+{q:"O coração é classificado como:",o:["Uma célula","Um tecido","Um órgão","Um organismo"],a:2,e:"O coração é um órgão formado por diferentes tecidos que trabalham juntos."},
+{q:"Qual é a principal função do sistema respiratório?",o:["Transportar o sangue","Realizar trocas gasosas, captando oxigênio e eliminando gás carbônico","Digestionar os alimentos","Controlar os movimentos voluntários"],a:1,e:"O sistema respiratório realiza as trocas gasosas entre o organismo e o ambiente."},
+{q:"Qual órgão bombeia o sangue para diferentes partes do corpo?",o:["Pulmão","Estômago","Coração","Rim"],a:2,e:"O coração bombeia o sangue, mantendo a circulação pelo organismo."},
+{q:"O sangue faz parte de qual sistema do corpo humano?",o:["Sistema circulatório","Sistema digestório","Sistema nervoso","Sistema esquelético"],a:0,e:"O sangue circula pelos vasos sanguíneos e integra o sistema circulatório."},
+{q:"Durante uma partida de futebol, o coração bate mais rápido e a respiração acelera. Por quê?",o:["Porque os sistemas trabalham juntos para atender às necessidades do corpo","Porque cada sistema funciona sem depender dos outros","Porque os músculos deixam de precisar de oxigênio","Porque somente o sistema digestório participa"],a:0,e:"Os sistemas respiratório, circulatório e muscular atuam de forma integrada durante o esforço."},
+{q:"Qual alternativa apresenta um exemplo de órgão?",o:["Célula nervosa","Tecido epitelial","Pulmão","Sistema digestório"],a:2,e:"O pulmão é um órgão formado por diferentes tecidos e participa da respiração."},
+{q:"O conjunto de órgãos que atua em uma função do organismo forma:",o:["Uma célula","Um sistema","Um tecido","Uma molécula"],a:1,e:"Órgãos que trabalham em conjunto formam um sistema."},
+{q:"Qual sistema é responsável por transformar os alimentos em substâncias que podem ser absorvidas pelo corpo?",o:["Sistema digestório","Sistema respiratório","Sistema nervoso","Sistema esquelético"],a:0,e:"O sistema digestório realiza a digestão e permite a absorção de nutrientes."},
+{q:"Qual sistema coordena muitas das atividades do corpo e recebe informações do ambiente?",o:["Sistema digestório","Sistema nervoso","Sistema muscular","Sistema circulatório"],a:1,e:"O sistema nervoso recebe e processa informações e coordena respostas do organismo."},
+{q:"Os músculos e os ossos atuam juntos principalmente para:",o:["Produzir os alimentos","Permitir a sustentação e os movimentos do corpo","Realizar as trocas gasosas","Filtrar o sangue"],a:1,e:"O sistema muscular e o esquelético trabalham juntos para sustentar o corpo e produzir movimentos."},
+{q:"Uma pessoa sofre uma lesão no tecido muscular da perna. O que pode acontecer?",o:["Os movimentos podem ser prejudicados","A lesão transforma o tecido em um sistema","Todos os órgãos deixam de funcionar imediatamente","Nada muda, pois tecidos não têm função"],a:0,e:"O tecido muscular participa da contração. Uma lesão pode dificultar os movimentos."},
+{q:"Qual alternativa apresenta corretamente a relação entre célula e tecido?",o:["Um tecido é formado por conjuntos de células","Uma célula é formada por vários organismos","Um tecido é sempre maior que um sistema","Células não participam da formação dos tecidos"],a:0,e:"Tecidos são conjuntos de células organizadas que desempenham funções relacionadas."},
+{q:"O estômago participa de qual sistema?",o:["Sistema respiratório","Sistema digestório","Sistema nervoso","Sistema urinário"],a:1,e:"O estômago é um órgão do sistema digestório e participa da digestão dos alimentos."},
+{q:"Qual é a sequência correta para estes exemplos: célula muscular, tecido muscular, coração, sistema cardiovascular e ser humano?",o:["Célula muscular → tecido muscular → órgão → sistema → organismo","Coração → célula muscular → organismo → tecido → sistema","Tecido → célula → sistema → órgão → organismo","Organismo → sistema → órgão → tecido → célula"],a:0,e:"A sequência vai da célula ao tecido, ao órgão, ao sistema e ao organismo."},
+{q:"Por que os sistemas do corpo humano precisam trabalhar em conjunto?",o:["Porque todos realizam exatamente a mesma tarefa","Porque o funcionamento do organismo depende da integração entre eles","Porque cada sistema pode substituir completamente os outros","Porque apenas um sistema mantém o corpo vivo"],a:1,e:"Os sistemas têm funções diferentes e complementares; juntos mantêm o organismo funcionando."},
+{q:"Em uma comparação com uma escola, os diferentes setores e equipes representam, no corpo humano:",o:["Partes organizadas que colaboram para o funcionamento do conjunto","Partes que não precisam se comunicar","Uma única célula","Apenas os órgãos do sistema digestório"],a:0,e:"Assim como os setores da escola, as partes do corpo têm funções específicas e atuam em conjunto."},
+{q:"Qual afirmação resume melhor a organização do corpo humano?",o:["O corpo é formado por partes isoladas e independentes","O corpo é organizado em níveis: células, tecidos, órgãos, sistemas e organismo","Os órgãos são menores que as células","Os sistemas não dependem do trabalho dos órgãos"],a:1,e:"O corpo humano apresenta níveis de organização que se integram, das células ao organismo."}
+];
+let index=0,score=0,chosen=null,locked=false,name="";
+function begin(){name=document.getElementById("student").value.trim();if(!name){alert("Digite seu nome para começar!");return;}document.getElementById("start").classList.add("hidden");document.getElementById("game").classList.remove("hidden");document.getElementById("playerTag").textContent=name;render();}
+function render(){chosen=null;locked=false;const item=quiz[index];document.getElementById("count").textContent=`Questão ${index+1} de ${quiz.length}`;document.getElementById("points").textContent=`${score} pontos`;document.getElementById("bar").style.width=`${index/quiz.length*100}%`;document.getElementById("question").textContent=item.q;document.getElementById("feedback").className="hidden";document.getElementById("feedback").textContent="";document.getElementById("next").disabled=true;document.getElementById("next").textContent="Confirmar resposta";const box=document.getElementById("options");box.innerHTML="";item.o.forEach((opt,i)=>{const b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+i)+") "+opt;b.onclick=()=>select(i,b);box.appendChild(b);});}
+function select(i,btn){if(locked)return;chosen=i;document.querySelectorAll(".option").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");document.getElementById("next").disabled=false;}
+function advance(){if(chosen===null)return;if(!locked){locked=true;const item=quiz[index],correct=chosen===item.a;if(correct)score++;document.querySelectorAll(".option").forEach((b,i)=>{b.disabled=true;if(i===item.a)b.classList.add("correct");if(i===chosen&&!correct)b.classList.add("wrong");});const f=document.getElementById("feedback");f.className="feedback "+(correct?"good":"bad");f.textContent=(correct?"✓ Muito bem! ":"✗ Não foi dessa vez. ")+item.e;document.getElementById("points").textContent=`${score} pontos`;document.getElementById("next").textContent=index===quiz.length-1?"Ver meu resultado":"Próxima questão";return;}index++;if(index<quiz.length)render();else finish();}
+function finish(){document.getElementById("game").classList.add("hidden");document.getElementById("result").classList.remove("hidden");document.getElementById("bar").style.width="100%";document.getElementById("finalName").textContent=name;document.getElementById("summaryName").textContent=name;document.getElementById("finalScore").textContent=score;document.getElementById("hits").textContent=score;document.getElementById("percent").textContent=score*5;document.getElementById("today").textContent=new Date().toLocaleDateString("pt-BR");let msg=score>=18?"Você é um(a) especialista em organização do corpo humano!":score>=14?"Muito bom! Você está no caminho certo!":score>=10?"Bom esforço! Revise as explicações e continue praticando.":"Missão de aprendizagem concluída! Reveja o conteúdo e tente novamente.";document.getElementById("message").textContent=msg;document.getElementById("encouragement").textContent=score>=14?"Continue assim: conhecimento se constrói a cada desafio!":"Não desanime: errar faz parte da aprendizagem. Você pode jogar novamente!";}
+function restart(){index=0;score=0;chosen=null;locked=false;document.getElementById("result").classList.add("hidden");document.getElementById("game").classList.add("hidden");document.getElementById("start").classList.remove("hidden");document.getElementById("student").value=name;}
+</script>
+</body>
+</html>
